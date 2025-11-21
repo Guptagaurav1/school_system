@@ -1,0 +1,23 @@
+@import "tailwindcss";
+
+
+@layer utilities {
+  .footer-card-shape {
+    /* Rounded-rect shell like the reference */
+    -webkit-clip-path: path("M 0 48 Q 0 0 48 0 H 1152 Q 1200 0 1200 48 V 802 Q 1200 850 1152 850 H 48 Q 0 850 0 802 Z");
+            clip-path: path("M 0 48 Q 0 0 48 0 H 1152 Q 1200 0 1200 48 V 802 Q 1200 850 1152 850 H 48 Q 0 850 0 802 Z");
+    
+    border-radius: 28px;
+  }
+
+
+  .shape{
+    width: 1200px;
+    height: 720px;
+    background-color: white;
+    border: 1px solid red;
+    -webkit-clip-path: path("M 20 80 L 360 80 A 20 20 0 0 1 380 100 L 380 140 A 20 20 0 0 0 400 160 L 700 160 A 20 20 0 0 0 720 140 L 720 100 A 20 20 0 0 1 740 80 L 780 80 A 20 20 0 0 1 800 100 L 800 700 A 20 20 0 0 1 780 720 L 20 720 A 20 20 0 0 1 0 700 L 0 100 A 20 20 0 0 1 20 80 Z");
+           /* Standard */
+      clip-path: path("M 20 80 L 360 80 A 20 20 0 0 1 380 100 L 380 140 A 20 20 0 0 0 400 160 L 700 160 A 20 20 0 0 0 720 140 L 720 100 A 20 20 0 0 1 740 80 L 780 80 A 20 20 0 0 1 800 100 L 800 700 A 20 20 0 0 1 780 720 L 20 720 A 20 20 0 0 1 0 700 L 0 100 A 20 20 0 0 1 20 80 Z");
+  }
+}
