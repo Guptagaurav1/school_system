@@ -1,5 +1,5 @@
 const { Model, where } = require("sequelize");
-const db = require("../db/models");
+const db = require(process.env.Root_Path+"/db/models");
 const { Class, students, sequelize } = db;
 const { Op } = require("sequelize");
 

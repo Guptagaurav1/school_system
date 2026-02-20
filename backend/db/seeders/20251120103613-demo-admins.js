@@ -14,7 +14,7 @@ module.exports = {
     const password = "Gupta@1234";
     const hashpassword = await bcrypt.hash(password, 10);
 
-    await queryInterface.bulkInsert('admins', [{
+    await queryInterface.bulkInsert('users', [{
       name: 'admin',
       email: "gaurav.gupta@prakharsoftwares.com",
       password: hashpassword,
@@ -31,7 +31,7 @@ module.exports = {
      * Example:
      * 
      */
-    await queryInterface.bulkDelete('admins', null, {});
+    await queryInterface.bulkDelete('users', null, {});
 
   }
 };

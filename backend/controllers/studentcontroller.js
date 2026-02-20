@@ -1,18 +1,18 @@
 // controllers/studentController.js
 
 const { Model, where } = require("sequelize");
-const db = require("../db/models");
+const db = require(process.env.Root_Path+"/db/models");
 const { Class, students, sequelize } = db;
-const { Op } = require("sequelize")
+const { Op } = require("sequelize");
+const sendEmail=require(process.env.Root_Path+"/services/emailServices");
+const bcrypt = require('bcryptjs');
 
 // Create Students
 
 const createStudents = async (req, res) => {
-
   const t = await sequelize.transaction();
 
   try {
-
     const {
       name,
       email,
@@ -22,11 +22,16 @@ const createStudents = async (req, res) => {
       rollno,
       dob,
       classid
-
     } = req.body;
 
+    if (!name || !email || !rollno) {
+      await t.rollback();
+      return res.status(400).send({
+        error: true,
+        message: "name, email, rollno are required."
+      });
+    }
 
-    // find email OR rollno
     const existing = await students.findOne({
       where: {
         [Op.or]: [
@@ -38,82 +43,61 @@ const createStudents = async (req, res) => {
 
     if (existing) {
       await t.rollback();
-
-      let msg = "";
-
-      if (existing.email === email) {
-        msg = "Email already exists";
-      } else if (existing.roll_no === rollno) {
-        msg = "Roll Number already exists";
-      }
-
       return res.status(400).send({
         error: true,
-        message: msg
+        message:existing.email === email
+        ? "Email already exists"
+        : "Roll Number already exists"
       });
     }
-
-
-
-    if (!name || !email || !rollno) {
-      await t.rollback();
-      return res.status(400).send({
-        error: true,
-        message: "name, email, rollno, className, and section are required."
-      });
-    }
-
 
     const nameParts = name.trim().split(" ");
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(" ") || null;
-
-    // 3️⃣ Create Student
+    const randomStudentpassword=name.substring(0,4)+"@"+dob.substring(6,9)+"#";
+    const hashpassword = await bcrypt.hash(randomStudentpassword, 10);
+  
     const student = await students.create(
       {
         first_name: firstName,
         last_name: lastName,
         email: email,
         roll_no: rollno,
-        dob: dob,
-        gender: gender,
-        phone: phone,
-        address: address,
-        class_id: classid
+        dob,
+        gender,
+        phone,
+        address,
+        password:hashpassword,
+        class_id: classid,
+        role_id:2
       },
       { transaction: t }
     );
 
-    // 4️⃣ Commit transaction
-
     await t.commit();
 
+   sendEmail(
+    email,
+    "Welcome to Our Student Portal!",
+    "student.ejs",
+    {email,randomStudentpassword}
+);
     return res.status(201).send({
       success: true,
       message: "Student added successfully",
       data: student
     });
-  }
-  catch (error) {
 
+  } catch (error) {
     await t.rollback();
-
-    let message = "Something went wrong";
-
-    if (error?.errors && error.errors[0]?.message) {
-      message = error.errors[0].message;
-    } else if (error.message) {
-      message = error.message;
-    }
-
-    console.error("Create Student Error:", error);
 
     return res.status(500).send({
       error: true,
-      message
+      message: error.message || "Something went wrong"
     });
   }
 };
+
 
 // Update Students
 
@@ -256,8 +240,6 @@ const getStudentslist=async(req,res)=>{
   }
 
 }
-
-
 
 
 module.exports = {

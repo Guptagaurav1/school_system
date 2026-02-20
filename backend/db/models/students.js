@@ -4,10 +4,15 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class students extends Model {
     static associate(models) {
-      // Student belongs to a Class
+
       students.belongsTo(models.Class, {
         foreignKey: 'class_id',
         as: 'classes'
+      });
+
+      students.belongsTo(models.Role, {
+        foreignKey: 'role_id',
+        as: 'roles'
       });
     }
   }
@@ -47,6 +52,18 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         defaultValue: 'Male',
       },
+
+      status: {
+        type: DataTypes.ENUM("active", "inactive"),
+        defaultValue: "active",
+        allowNull: false
+      },
+
+      password: {
+        type: DataTypes.TEXT,
+        allowNull: false,
+      },
+
       phone: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -62,6 +79,16 @@ module.exports = (sequelize, DataTypes) => {
           model: 'Class',
           key: 'class_id',
         },
+      },
+
+      role_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: "Role",
+          key: "role_id"
+        }
+
       },
       created_by: {
         type: DataTypes.INTEGER,
@@ -81,7 +108,7 @@ module.exports = (sequelize, DataTypes) => {
       modelName: 'students',
       underscored: true,
       timestamps: true,
-      paranoid: true, // deleted_at automatically
+      paranoid: true,
     }
   );
 

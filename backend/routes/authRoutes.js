@@ -1,5 +1,5 @@
 const express = require("express");
-const { login, refresh } = require("../controllers/authController");
+const { login, refresh } = require(process.env.Root_Path+"/controllers/authController");
 
 const router = express.Router();
 

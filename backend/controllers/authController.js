@@ -1,7 +1,7 @@
-const db = require("../db/models");
-const { Admin } = db;
+const db = require(process.env.Root_Path+"/db/models");
+const { User, Role } = db;
 const bcrypt = require("bcryptjs");
-const { generateTokens } = require("../utils/generateTokens");
+const { generateTokens } = require(process.env.Root_Path+"/utils/generateTokens");
 const jwt = require("jsonwebtoken");
 
 
@@ -11,7 +11,9 @@ const login = async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        const user = await Admin.findOne({ where: { email } });
+        const user = await User.findOne({
+            where: { email }
+        });
 
         if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -27,13 +29,12 @@ const login = async (req, res) => {
 
         if (!matchPassword) return res.status(400).json({ message: "Wrong password" });
 
-        if (user.name !== "admin") {
-            return res.status(403).json({ message: "Access denied: only admins can log in" });
-        }
 
         const { accessToken, refreshToken } = generateTokens(user);
 
-        const allAdmins = await Admin.findAll({
+
+        const allAdmins = await User.findOne({
+            where: { email },
             attributes: { exclude: ["password"] },
         });
 
@@ -62,12 +63,12 @@ const refresh = async (req, res) => {
 
         const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
 
-        const user = await Admin.findByPk(decoded.id);
+        const user = await User.findByPk(decoded.id);
 
         if (!user) return res.status(404).json({ message: "User not found" });
 
         const accessToken = jwt.sign(
-            { id: user.id, role: user.role },
+            { id: user.id, role: user.name },
             process.env.JWT_ACCESS_SECRET,
             { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
         );
