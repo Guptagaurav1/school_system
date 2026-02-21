@@ -23,11 +23,11 @@ jobs:
       - name: Upload Frontend to cPanel
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          port: ${{ secrets.CPANEL_PORT }}
-          source: "frontend/dist/*"
+          host: ${{secrets.CPANEL_HOST }}
+          username: ${{secrets.CPANEL_USER }}
+          key: ${{secrets.SSH_PRIVATE_KEY}}
+          port: ${{secrets.CPANEL_PORT }}
+          source: "frontEnd/dist/*"
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/"
 
       # ================= BACKEND =================
