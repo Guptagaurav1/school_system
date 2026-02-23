@@ -92,6 +92,105 @@
 
 
 
+# name: Deploy Full Project (Frontend + Backend)
+
+# on:
+#   push:
+#     branches:
+#       - main
+
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       # Checkout Repo
+#       - name: Checkout Code
+#         uses: actions/checkout@v3
+
+#       # =========================
+#       # FRONTEND BUILD
+#       # =========================
+#       - name: Install Frontend Dependencies
+#         working-directory: frontEnd
+#         run: npm ci
+
+#       - name: Build Frontend (Inject Production Env)
+#         working-directory: frontEnd
+#         env:
+#           VITE_APP_SERVER_PATH: ${{ secrets.VITE_APP_SERVER_PATH }}
+#         run: npm run build
+
+#       # =========================
+#       # CLEAN OLD FRONTEND FILES
+#       # =========================
+#       - name: Clean old frontend build on server
+#         uses: appleboy/ssh-action@v0.1.10
+#         with:
+#           host: ${{ secrets.CPANEL_HOST }}
+#           username: ${{ secrets.CPANEL_USER }}
+#           key: ${{ secrets.SSH_PRIVATE_KEY }}
+#           port: ${{ secrets.CPANEL_PORT }}
+#           script: |
+#             cd /home/${{ secrets.CPANEL_USER }}/public_html
+#             rm -rf assets
+#             rm -f index.html
+
+#       # =========================
+#       # UPLOAD FRONTEND DIST
+#       # =========================
+#       - name: Upload Frontend dist to public_html
+#         uses: appleboy/scp-action@v0.1.7
+#         with:
+#           host: ${{ secrets.CPANEL_HOST }}
+#           username: ${{ secrets.CPANEL_USER }}
+#           key: ${{ secrets.SSH_PRIVATE_KEY }}
+#           port: ${{ secrets.CPANEL_PORT }}
+#           source: "frontEnd/dist/**"
+#           target: "/home/${{ secrets.CPANEL_USER }}/public_html/"
+#           strip_components: 2
+#           overwrite: true
+
+#       # =========================
+#       # UPLOAD BACKEND (SERVER)
+#       # =========================
+#       - name: Upload Backend to cPanel (server folder)
+#         uses: appleboy/scp-action@v0.1.7
+#         with:
+#           host: ${{ secrets.CPANEL_HOST }}
+#           username: ${{ secrets.CPANEL_USER }}
+#           key: ${{ secrets.SSH_PRIVATE_KEY }}
+#           port: ${{ secrets.CPANEL_PORT }}
+#           source: "backend/**"
+#           target: "/home/${{ secrets.CPANEL_USER }}/public_html/server/"
+#           strip_components: 1
+#           overwrite: true
+
+#       # =========================
+#       # INSTALL BACKEND & RESTART PM2
+#       # =========================
+#       - name: Install Backend & Restart PM2
+#         uses: appleboy/ssh-action@v0.1.10
+#         with:
+#           host: ${{ secrets.CPANEL_HOST }}
+#           username: ${{ secrets.CPANEL_USER }}
+#           key: ${{ secrets.SSH_PRIVATE_KEY }}
+#           port: ${{ secrets.CPANEL_PORT }}
+#           script: |
+#             cd /home/${{ secrets.CPANEL_USER }}/public_html/server
+#             npm install --omit=dev
+#             pm2 restart 0 || pm2 start index.js --name server
+#             pm2 save
+
+
+
+
+
+
+# Another New One
+
+
+
 name: Deploy Full Project (Frontend + Backend)
 
 on:
@@ -104,7 +203,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout Repo
+      # =========================
+      # CHECKOUT REPOSITORY
+      # =========================
       - name: Checkout Code
         uses: actions/checkout@v3
 
@@ -115,16 +216,16 @@ jobs:
         working-directory: frontEnd
         run: npm ci
 
-      - name: Build Frontend (Inject Production Env)
+      - name: Build Frontend (Production)
         working-directory: frontEnd
         env:
           VITE_APP_SERVER_PATH: ${{ secrets.VITE_APP_SERVER_PATH }}
         run: npm run build
 
       # =========================
-      # CLEAN OLD FRONTEND FILES
+      # CLEAN OLD FRONTEND FILES (SAFE)
       # =========================
-      - name: Clean old frontend build on server
+      - name: Remove old frontend build files only
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.CPANEL_HOST }}
@@ -133,11 +234,13 @@ jobs:
           port: ${{ secrets.CPANEL_PORT }}
           script: |
             cd /home/${{ secrets.CPANEL_USER }}/public_html
+
+            # Remove only old Vite build files
             rm -rf assets
             rm -f index.html
 
       # =========================
-      # UPLOAD FRONTEND DIST
+      # UPLOAD NEW FRONTEND BUILD
       # =========================
       - name: Upload Frontend dist to public_html
         uses: appleboy/scp-action@v0.1.7
@@ -152,9 +255,9 @@ jobs:
           overwrite: true
 
       # =========================
-      # UPLOAD BACKEND (SERVER)
+      # UPLOAD BACKEND
       # =========================
-      - name: Upload Backend to cPanel (server folder)
+      - name: Upload Backend to server folder
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.CPANEL_HOST }}
@@ -169,7 +272,7 @@ jobs:
       # =========================
       # INSTALL BACKEND & RESTART PM2
       # =========================
-      - name: Install Backend & Restart PM2
+      - name: Install Backend Dependencies & Restart PM2
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.CPANEL_HOST }}
@@ -178,6 +281,19 @@ jobs:
           port: ${{ secrets.CPANEL_PORT }}
           script: |
             cd /home/${{ secrets.CPANEL_USER }}/public_html/server
+
+            # Install production dependencies
             npm install --omit=dev
-            pm2 restart 0 || pm2 start index.js --name server
+
+            # Restart existing PM2 process or start if not running
+            pm2 restart server || pm2 start index.js --name server
+
             pm2 save
+
+
+
+
+
+
+
+

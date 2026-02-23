@@ -159,7 +159,7 @@ export default function LoginPage() {
             </div>
 
             <Button className="w-full" size="sm" type="submit">
-              Sign In CI AND CD
+              Sign In CI AND CD Testing Button
             </Button>
           </form>
         )}
