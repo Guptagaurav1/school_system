@@ -24,7 +24,7 @@ jobs:
           VITE_APP_SERVER_PATH: ${{ secrets.VITE_APP_SERVER_PATH }}
         run: npm run build
 
-      # ================= DEPLOY FRONTEND DIST =================
+      # ================= DEPloyement =================
       - name: Upload Frontend dist to public_html
         uses: appleboy/scp-action@v0.1.7
         with:
