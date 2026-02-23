@@ -10,10 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout Repo
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      
+      # =========================
+      # FRONTEND BUILD
+      # =========================
       - name: Install Frontend Dependencies
         working-directory: frontEnd
         run: npm ci
@@ -24,7 +27,24 @@ jobs:
           VITE_APP_SERVER_PATH: ${{ secrets.VITE_APP_SERVER_PATH }}
         run: npm run build
 
-      # ================= DEPloyement =================
+      # =========================
+      # CLEAN OLD FRONTEND FILES
+      # =========================
+      - name: Clean old frontend build on server
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.CPANEL_PORT }}
+          script: |
+            cd /home/${{ secrets.CPANEL_USER }}/public_html
+            rm -rf assets
+            rm -f index.html
+
+      # =========================
+      # UPLOAD FRONTEND DIST
+      # =========================
       - name: Upload Frontend dist to public_html
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -34,9 +54,12 @@ jobs:
           port: ${{ secrets.CPANEL_PORT }}
           source: "frontEnd/dist/**"
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/"
+          strip_components: 2
           overwrite: true
 
-      # ================= DEPLOY BACKEND CODE =================
+      # =========================
+      # UPLOAD BACKEND (SERVER)
+      # =========================
       - name: Upload Backend to cPanel (server folder)
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -44,11 +67,14 @@ jobs:
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.CPANEL_PORT }}
-          source: "backend/**"
+          source: "server/**"
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/server/"
+          strip_components: 1
           overwrite: true
 
-      # ================= INSTALL & RESTART BACKEND =================
+      # =========================
+      # INSTALL BACKEND & RESTART PM2
+      # =========================
       - name: Install Backend & Restart PM2
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -59,5 +85,5 @@ jobs:
           script: |
             cd /home/${{ secrets.CPANEL_USER }}/public_html/server
             npm install --omit=dev
-            pm2 restart 0
+            pm2 restart 0 || pm2 start index.js --name server
             pm2 save
