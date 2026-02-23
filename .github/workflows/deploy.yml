@@ -14,36 +14,27 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # ================= FRONTEND =================
-      - name: Install & Build Frontend
-        run: |
-          cd frontEnd
-          npm install
-          npm run build
-
-      # ================= BACKEND =================
+      # ================= BACKEND UPLOAD =================
       - name: Upload Backend to cPanel
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_KEY_PASS }}
           port: ${{ secrets.CPANEL_PORT }}
           source: "backend/*"
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/server/"
           overwrite: true
 
-      # ================= INSTALL & RESTART Again =================
+      # ================= INSTALL & RESTART =================
       - name: Install Backend & Restart Server
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_KEY_PASS }}
           port: ${{ secrets.CPANEL_PORT }}
           script: |
             cd /home/${{ secrets.CPANEL_USER }}/public_html/server
             npm install
-            pm2 restart 0 || pm2 start index.js --name server
+            pm2 restart 0
