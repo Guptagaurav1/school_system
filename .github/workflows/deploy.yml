@@ -1,4 +1,4 @@
-name: Deploy Full Project
+name: Deploy Full Project (Frontend + Backend)
 
 on:
   push:
@@ -13,7 +13,38 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Upload Backend to cPanel
+      # ================= FRONTEND BUILD =================
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Frontend Dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build Frontend (Inject Production Env)
+        working-directory: frontend
+        env:
+          VITE_APP_SERVER_PATH: ${{ secrets.VITE_APP_SERVER_PATH }}
+        run: npm run build
+
+      # ================= DEPLOY FRONTEND DIST =================
+      - name: Upload Frontend dist to public_html
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.CPANEL_HOST }}
+          username: ${{ secrets.CPANEL_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.CPANEL_PORT }}
+          source: "frontend/dist/**"
+          target: "/home/${{ secrets.CPANEL_USER }}/public_html/"
+          overwrite: true
+
+      # ================= DEPLOY BACKEND CODE =================
+      - name: Upload Backend to cPanel (server folder)
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.CPANEL_HOST }}
@@ -24,7 +55,8 @@ jobs:
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/server/"
           overwrite: true
 
-      - name: Install Backend & Restart Server
+      # ================= INSTALL & RESTART BACKEND =================
+      - name: Install Backend & Restart PM2
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: ${{ secrets.CPANEL_HOST }}
@@ -33,6 +65,6 @@ jobs:
           port: ${{ secrets.CPANEL_PORT }}
           script: |
             cd /home/${{ secrets.CPANEL_USER }}/public_html/server
-            npm install
+            npm install --omit=dev
             pm2 restart 0
             pm2 save
