@@ -25,7 +25,7 @@ jobs:
         with:
           host: ${{secrets.CPANEL_HOST }}
           username: ${{secrets.CPANEL_USER }}
-          key: ${{secrets.SSH_PRIVATE_KEY}}
+          key: ${{secrets.CPANEL_PASSWORD}}
           port: ${{secrets.CPANEL_PORT }}
           source: "frontEnd/dist/*"
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/"
@@ -36,7 +36,7 @@ jobs:
         with:
           host: ${{ secrets.CPANEL_HOST }}
           username: ${{ secrets.CPANEL_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.CPANEL_PASSWORD }}
           port: ${{ secrets.CPANEL_PORT }}
           source: "backend/*"
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/server/"
