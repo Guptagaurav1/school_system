@@ -46,7 +46,7 @@ jobs:
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/server/"
           overwrite: true
 
-      # ================= INSTALL & RESTART =================
+      # ================= INSTALL & RESTART Again =================
       - name: Install Backend & Restart Server
         uses: appleboy/ssh-action@v0.1.10
         with:
