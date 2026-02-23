@@ -10,11 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ================= CHECKOUT =================
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      # ================= BACKEND UPLOAD =================
       - name: Upload Backend to cPanel
         uses: appleboy/scp-action@v0.1.7
         with:
@@ -22,11 +20,10 @@ jobs:
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.CPANEL_PORT }}
-          source: "backend/*"
+          source: "backend/**"
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/server/"
           overwrite: true
 
-      # ================= INSTALL & RESTART =================
       - name: Install Backend & Restart Server
         uses: appleboy/ssh-action@v0.1.10
         with:
