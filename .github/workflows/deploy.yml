@@ -21,18 +21,6 @@ jobs:
           npm install
           npm run build
 
-      - name: Upload Frontend to cPanel
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.CPANEL_HOST }}
-          username: ${{ secrets.CPANEL_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_KEY_PASS }}
-          port: ${{ secrets.CPANEL_PORT }}
-          source: "frontEnd/dist/*"
-          target: "/home/${{ secrets.CPANEL_USER }}/public_html/"
-          overwrite: true
-
       # ================= BACKEND =================
       - name: Upload Backend to cPanel
         uses: appleboy/scp-action@v0.1.7
