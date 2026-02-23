@@ -1,5 +1,5 @@
 const express = require("express");
-const { studentLogin } = require(process.env.Root_Path+"/controllers/studentAuthController");
+const { studentLogin } = require(process.env.Root_Path+"/controllers/studentauthController");
 
 const router = express.Router();
 
