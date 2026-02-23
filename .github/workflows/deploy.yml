@@ -67,7 +67,7 @@ jobs:
           username: ${{ secrets.CPANEL_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.CPANEL_PORT }}
-          source: "server/**"
+          source: "backend/**"
           target: "/home/${{ secrets.CPANEL_USER }}/public_html/server/"
           strip_components: 1
           overwrite: true
