@@ -7,7 +7,6 @@ import { useAuth } from "../../context/Authcontext";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
 
-// ---------------- TYPES ----------------
 
 interface LoginForm {
   email: string;
