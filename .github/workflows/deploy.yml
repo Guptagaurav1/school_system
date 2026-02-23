@@ -15,7 +15,7 @@ jobs:
 
       # ================= FRONTEND BUILD =================
       - name: Install Frontend Dependencies
-        working-directory: frontend
+        working-directory: frontEnd
         run: npm ci
 
       - name: Build Frontend (Inject Production Env)
