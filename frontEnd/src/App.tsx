@@ -1,44 +1,51 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router";
-import SignIn from "./pages/AuthPages/SignIn";
-import NotFound from "./pages/OtherPage/NotFound";
-import UserProfiles from "./pages/UserProfiles";
-import Videos from "./pages/UiElements/Videos";
-import Images from "./pages/UiElements/Images";
-import Alerts from "./pages/UiElements/Alerts";
-import Badges from "./pages/UiElements/Badges";
-import Avatars from "./pages/UiElements/Avatars";
-import Buttons from "./pages/UiElements/Buttons";
-import LineChart from "./pages/Charts/LineChart";
-import BarChart from "./pages/Charts/BarChart";
-import Calendar from "./pages/Calendar";
-import BasicTables from "./pages/Tables/BasicTables";
-import FormElements from "./pages/Forms/FormElements";
-import AppLayout from "./layout/AppLayout";
-import { ScrollToTop } from "./components/common/ScrollToTop";
-import Home from "./pages/Dashboard/Home";
-import ProtectedRoute from "./routes/adminProtectedRoutes";
-import PublicRoute from "./routes/publicRoutes";
-import AddClass from "./pages/master/add-class";
-import AddStudents from "./pages/students/add-student";
-import StudentList from "./pages/students/student-list";
-import StudentDetails from "./pages/students/studentDetails";
-import StudentAppLayout from "./studentLayouts/StudentLayoutsRender";
-import StudentDashboard from "./pages/Student_Dashboard/Student_dashboard";
-import Addrole from "./pages/master/add-role";
-import UserList from "./pages/Users/UserList";
-import AddUser from "./pages/Users/AddUser";
+// Import Lazy Loading
+import { lazy, Suspense } from "react";
+const SignIn = lazy(() => import("./pages/AuthPages/SignIn"));  
+const NotFound = lazy(() => import("./pages/OtherPage/NotFound"));
+const UserProfiles = lazy(() => import("./pages/UserProfiles"));
+const Videos = lazy(() => import("./pages/UiElements/Videos"));
+const Images = lazy(() => import("./pages/UiElements/Images"));
+const Alerts = lazy(() => import("./pages/UiElements/Alerts"));
+const Badges = lazy(() => import("./pages/UiElements/Badges"));
+const Avatars = lazy(() => import("./pages/UiElements/Avatars"));
+const Buttons = lazy(() => import("./pages/UiElements/Buttons"));
+  const LineChart = lazy(() => import("./pages/Charts/LineChart"));
+const BarChart = lazy(() => import("./pages/Charts/BarChart"));
+const AppLayout = lazy(() => import("./layout/AppLayout"));
+const ScrollToTop = lazy(() => import("./components/common/ScrollToTop").then(module => ({ default: module.ScrollToTop })));
+const Home = lazy(() => import("./pages/Dashboard/Home"));
+const ProtectedRoute = lazy(() => import("./routes/adminProtectedRoutes"));
+const PublicRoute = lazy(() => import("./routes/publicRoutes"));
+const AddClass = lazy(() => import("./pages/master/add-class"));
+const AddStudents = lazy(() => import("./pages/students/add-student"));
+const StudentList = lazy(() => import("./pages/students/student-list"));
+const StudentDetails = lazy(() => import("./pages/students/studentDetails"));
+const StudentAppLayout = lazy(() => import("./studentLayouts/StudentLayoutsRender"));
+const StudentDashboard = lazy(() => import("./pages/Student_Dashboard/Student_dashboard"));
+const Addrole = lazy(() => import("./pages/master/add-role"));
+const UserList = lazy(() => import("./pages/Users/UserList"));
+const AddUser = lazy(() => import("./pages/Users/AddUser"));
 
-import TeacherAppLayout from "./TeacherLayouts/TeacherLayoutsRender";
-import TeacherDasboard from "./pages/Student_Dashboard/Student_dashboard";
+const TeacherAppLayout = lazy(() => import("./TeacherLayouts/TeacherLayoutsRender"));
+const TeacherDasboard = lazy(() => import("./pages/Student_Dashboard/Student_dashboard"));
+const Calendar = lazy(() => import("./pages/Calendar"));
+const FormElements = lazy(() => import("./pages/Forms/FormElements"));
+const BasicTables = lazy(() => import("./pages/Tables/BasicTables"));
+import Loader from "./components/loader/loader";
 
 
 
 export default function App() {
   return (
     <Router>
-      <ScrollToTop />
-
-      <Routes>
+      <Suspense fallback={
+        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
+          <Loader />
+        </div>
+      }>
+        <ScrollToTop />
+        <Routes>
         <Route element={<PublicRoute />}>
           <Route path="/" element={<SignIn />} />
         </Route>
@@ -148,7 +155,7 @@ export default function App() {
         {/* 404 Page */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-
+      </Suspense>
     </Router>
   );
 }
