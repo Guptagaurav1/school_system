@@ -32,18 +32,12 @@ const TeacherDasboard = lazy(() => import("./pages/Student_Dashboard/Student_das
 const Calendar = lazy(() => import("./pages/Calendar"));
 const FormElements = lazy(() => import("./pages/Forms/FormElements"));
 const BasicTables = lazy(() => import("./pages/Tables/BasicTables"));
-import Loader from "./components/loader/loader";
 
 
 
 export default function App() {
   return (
     <Router>
-      <Suspense fallback={
-        <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-          <Loader />
-        </div>
-      }>
         <ScrollToTop />
         <Routes>
         <Route element={<PublicRoute />}>
@@ -86,11 +80,6 @@ export default function App() {
             <Route path="/admin-dashboard/create-user" element={<AddUser/>}/>
 
             
-
-
-
-           
-
             {/* Tables */}
 
             <Route path="basic-tables" element={<BasicTables />} />
@@ -140,8 +129,6 @@ export default function App() {
 
             {/* Others */}
             
-            
-           
             <Route path="basic-tables" element={<BasicTables />} /> 
 
            {/* Charts */}
@@ -155,7 +142,6 @@ export default function App() {
         {/* 404 Page */}
         <Route path="*" element={<NotFound />} />
       </Routes>
-      </Suspense>
     </Router>
   );
 }
